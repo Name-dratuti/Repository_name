@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Red Vibe Calculator: Corporate Edition</title>
+    <style>
+        body { 
+            background: #ffffff; 
+            color: #ff0000; 
+            font-family: 'Courier New', monospace; 
+            margin: 0; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        #matrix { 
+            position: fixed; 
+            top: 0; left: 0; 
+            z-index: -1; 
+            filter: opacity(0.2); 
+        }
+        
+        .calc-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 90vh;
+            width: 100%;
+        }
+
+        .calc-body {
+            background: #ffffff;
+            border: 4px solid #ff0000;
+            box-shadow: 10px 10px 0px #ff0000;
+            padding: 25px;
+            width: 320px;
+            z-index: 10;
+        }
+
+        #display {
+            width: 100%; height: 60px;
+            background: #fff; border: 2px solid #ff0000;
+            color: #ff0000; font-size: 2rem;
+            text-align: right; padding: 10px;
+            box-sizing: border-box; margin-bottom: 20px;
+            font-family: inherit;
+        }
+
+        .buttons { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+        
+        button {
+            padding: 15px; background: #fff;
+            border: 2px solid #ff0000; color: #ff0000;
+            cursor: pointer; font-family: inherit;
+            font-size: 1.2rem; font-weight: bold;
+            transition: 0.1s;
+        }
+
+        button:hover { background: #ff0000; color: #fff; }
+        .span-2 { grid-column: span 2; }
+
+        .history-section {
+            background: rgba(255, 255, 255, 0.9);
+            border-top: 4px solid #ff0000;
+            padding: 40px 20px;
+            width: 100%;
+            max-width: 800px;
+            box-sizing: border-box;
+            text-align: center;
+        }
+
+        .corporate-footer {
+            width: 100%;
+            padding: 20px;
+            background: #ff0000;
+            color: #ffffff;
+            text-align: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+            text-transform: uppercase;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="matrix"></canvas>
+
+    <div class="calc-wrapper">
+        <div class="calc-body">
+            <input type="text" id="display" disabled placeholder="0">
+            <div class="buttons">
+                <button onclick="clearDisplay()" class="span-2">C</button>
+                <button onclick="deleteLast()">DEL</button>
+                <button onclick="addToDisplay('/')">/</button>
+                <button onclick="addToDisplay('7')">7</button>
+                <button onclick="addToDisplay('8')">8</button>
+                <button onclick="addToDisplay('9')">9</button>
+                <button onclick="addToDisplay('*')">*</button>
+                <button onclick="addToDisplay('4')">4</button>
+                <button onclick="addToDisplay('5')">5</button>
+                <button onclick="addToDisplay('6')">6</button>
+                <button onclick="addToDisplay('-')">-</button>
+                <button onclick="addToDisplay('1')">1</button>
+                <button onclick="addToDisplay('2')">2</button>
+                <button onclick="addToDisplay('3')">3</button>
+                <button onclick="addToDisplay('+')">+</button>
+                <button onclick="addToDisplay('0')" class="span-2">0</button>
+                <button onclick="calculate()" class="span-2">=</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="history-section">
+        <h2>История Калькулятора</h2>
+        <p>От древнего абака до твоего браузера. Первый механический калькулятор появился в XVII веке, а первый электронный — в XX. Но этот — единственный в своём роде.</p>
+    </div>
+
+    <div class="corporate-footer">
+        Бебебе бебебе, но корпаратив все дела, нюхай бабара.
+    </div>
+
+    <script>
+        const canvas = document.getElementById('matrix');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const textToFall = "Калькулятор ;D";
+        const fontSize = 18;
+        const columns = canvas.width / (fontSize * 1.5);
+        const drops = Array(Math.floor(columns)).fill(1);
+
+        function draw() {
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#ff0000';
+            ctx.font = 'bold ' + fontSize + 'px Courier New';
+            for (let i = 0; i < drops.length; i++) {
+                ctx.fillText(textToFall, i * fontSize * 8, drops[i] * fontSize);
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.95) drops[i] = 0;
+                drops[i]++;
+            }
+        }
+        setInterval(draw, 50);
+
+        const display = document.getElementById('display');
+        function addToDisplay(value) { display.value += value; }
+        function clearDisplay() { display.value = ''; }
+        function deleteLast() { display.value = display.value.slice(0, -1); }
+        function calculate() {
+            try { display.value = eval(display.value); } 
+            catch { display.value = 'Ошибка'; setTimeout(clearDisplay, 1000); }
+        }
+        window.onresize = () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; };
+    </script>
+</body>
+</html>
