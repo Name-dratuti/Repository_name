@@ -2,13 +2,26 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <!-- ВОТ ЭТА СТРОЧКА ДЛЯ МОБИЛОК -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Vibe Calc Mobile</title>
+    <title>Vibe Calc Pro Max Secure</title>
     <style>
+        :root {
+            --bg-color: #ffffff;
+            --text-color: #ff0000;
+            --calc-bg: #ffffff;
+            --matrix-opacity: 0.2;
+        }
+
+        body.dark-mode {
+            --bg-color: #000000;
+            --text-color: #ff0000;
+            --calc-bg: #1a1a1a;
+            --matrix-opacity: 0.4;
+        }
+
         body { 
-            background: #ffffff; 
-            color: #ff0000; 
+            background: var(--bg-color); 
+            color: var(--text-color); 
             font-family: 'Courier New', monospace; 
             margin: 0; 
             display: flex; 
@@ -16,14 +29,16 @@
             align-items: center; 
             min-height: 100vh;
             overflow-x: hidden;
-            touch-action: manipulation; /* Убирает задержку клика на мобилках */
+            touch-action: manipulation;
+            transition: background 0.3s, color 0.3s;
+            user-select: none;
         }
         
         #matrix { 
             position: fixed; 
             top: 0; left: 0; 
             z-index: -1; 
-            filter: opacity(0.2); 
+            filter: opacity(var(--matrix-opacity)); 
         }
         
         .calc-wrapper {
@@ -32,80 +47,99 @@
             align-items: center;
             flex-grow: 1;
             width: 100%;
-            padding: 20px 0;
+            padding: 40px 15px;
+            box-sizing: border-box;
         }
 
         .calc-body {
-            background: #ffffff;
-            border: 4px solid #ff0000;
-            box-shadow: 10px 10px 0px #ff0000;
-            padding: 20px;
-            width: 90%; /* Ширина на мобилках */
-            max-width: 340px; /* Максимальная ширина на ПК */
+            background: var(--calc-bg);
+            border: 4px solid var(--text-color);
+            box-shadow: 10px 10px 0px var(--text-color);
+            padding: 25px;
+            width: 100%;
+            max-width: 360px;
             z-index: 10;
         }
 
         #display {
-            width: 100%; height: 70px;
-            background: #fff; border: 2px solid #ff0000;
-            color: #ff0000; font-size: 2.5rem;
+            width: 100%; height: 80px;
+            background: var(--calc-bg); 
+            border: 2px solid var(--text-color);
+            color: var(--text-color); 
+            font-size: 2.5rem;
             text-align: right; padding: 10px;
-            box-sizing: border-box; margin-bottom: 20px;
+            box-sizing: border-box; margin-bottom: 25px;
             font-family: inherit;
+            outline: none;
         }
 
-        .buttons { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+        .buttons { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
         
         button {
-            padding: 20px 10px; /* Кнопки побольше для пальцев */
-            background: #fff;
-            border: 2px solid #ff0000; color: #ff0000;
+            padding: 18px 5px;
+            background: var(--calc-bg);
+            border: 2px solid var(--text-color); 
+            color: var(--text-color);
             cursor: pointer; font-family: inherit;
-            font-size: 1.5rem; font-weight: bold;
+            font-size: 1.4rem; font-weight: bold;
             transition: 0.1s;
             -webkit-tap-highlight-color: transparent;
         }
 
-        button:hover { background: #ff0000; color: #fff; }
-        button:active { transform: scale(0.95); }
+        button:hover { background: var(--text-color); color: var(--bg-color); }
+        button:active { transform: scale(0.92); background: var(--text-color); color: var(--bg-color); }
 
         .span-2 { grid-column: span 2; }
 
+        .bottom-info {
+            grid-column: span 4;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 5px;
+        }
+
+        .info-box {
+            padding: 15px 5px;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid var(--text-color);
+            background: var(--calc-bg);
+            font-weight: 900;
+            letter-spacing: 1px;
+        }
+
         .history-section {
-            background: rgba(255, 255, 255, 0.9);
-            border-top: 4px solid #ff0000;
+            background: var(--bg-color);
+            border-top: 4px solid var(--text-color);
             padding: 30px 20px;
             width: 100%;
             max-width: 800px;
             box-sizing: border-box;
             text-align: center;
+            margin-top: 20px;
+            transition: background 0.3s;
         }
 
         .corporate-footer {
             width: 100%;
-            padding: 20px;
-            background: #ff0000;
-            color: #ffffff;
+            padding: 25px;
+            background: var(--text-color);
+            color: var(--bg-color);
             text-align: center;
             font-weight: bold;
-            font-size: 1rem;
             text-transform: uppercase;
-        }
-
-        /* Адаптация под совсем маленькие экраны */
-        @media (max-width: 360px) {
-            h1 { font-size: 1.5rem; }
-            button { padding: 15px 5px; font-size: 1.2rem; }
-            #display { height: 60px; font-size: 2rem; }
         }
     </style>
 </head>
-<body>
+<body oncontextmenu="return false;">
     <canvas id="matrix"></canvas>
 
     <div class="calc-wrapper">
         <div class="calc-body">
-            <input type="text" id="display" disabled placeholder="0">
+            <input type="text" id="display" readonly placeholder="0">
             <div class="buttons">
                 <button onclick="clearDisplay()" class="span-2">C</button>
                 <button onclick="deleteLast()">DEL</button>
@@ -124,6 +158,11 @@
                 <button onclick="addToDisplay('+')">+</button>
                 <button onclick="addToDisplay('0')" class="span-2">0</button>
                 <button onclick="calculate()" class="span-2">=</button>
+                
+                <div class="bottom-info">
+                    <div id="clock" class="info-box">00:00:00</div>
+                    <button id="theme-toggle" class="info-box" style="width: 100%;">🌙 Тема</button>
+                </div>
             </div>
         </div>
     </div>
@@ -134,53 +173,75 @@
     </div>
 
     <div class="corporate-footer">
-    Бебебе бебебе, но Корпаратив все дела, нюхай бабара.
-</div>
+        Бебебе бебебе, но Корпаратив все дела, нюхай бабара.
+    </div>
 
     <script>
         const canvas = document.getElementById('matrix');
         const ctx = canvas.getContext('2d');
-        
-        function resize() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        }
-        window.onresize = resize;
-        resize();
-
+        function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+        window.onresize = resize; resize();
         const textToFall = "Калькулятор ;D";
         const fontSize = 16;
-        let columns = canvas.width / (fontSize * 4);
-        let drops = Array(Math.floor(columns)).fill(1);
-
+        let drops = Array(Math.floor(canvas.width / (fontSize * 4))).fill(1);
         function draw() {
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+            ctx.fillStyle = document.body.classList.contains('dark-mode') ? 'rgba(0, 0, 0, 0.1)' : 'rgba(255, 255, 255, 0.1)';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             ctx.fillStyle = '#ff0000';
             ctx.font = 'bold ' + fontSize + 'px Courier New';
-            for (let i = 0; i < drops.length; i++) {
-                ctx.fillText(textToFall, i * fontSize * 6, drops[i] * fontSize);
-                if (drops[i] * fontSize > canvas.height && Math.random() > 0.95) drops[i] = 0;
+            drops.forEach((y, i) => {
+                ctx.fillText(textToFall, i * fontSize * 6, y * fontSize);
+                if (y * fontSize > canvas.height && Math.random() > 0.95) drops[i] = 0;
                 drops[i]++;
-            }
+            });
         }
         setInterval(draw, 50);
 
+        function updateClock() {
+            const options = {timeZone: 'Asia/Vladivostok', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false};
+            document.getElementById('clock').textContent = new Date().toLocaleTimeString('ru-RU', options);
+        }
+        setInterval(updateClock, 1000); updateClock();
+
         const display = document.getElementById('display');
-        function addToDisplay(value) { display.value += value; }
+        function addToDisplay(v) { display.value += v; }
         function clearDisplay() { display.value = ''; }
         function deleteLast() { display.value = display.value.slice(0, -1); }
         function calculate() {
             try { 
-                let result = eval(display.value);
-                display.value = Number.isInteger(result) ? result : result.toFixed(2);
-            } 
-            catch { display.value = 'Ошибка'; setTimeout(clearDisplay, 1000); }
+                let res = eval(display.value);
+                if (res === undefined || res === Infinity) return;
+                display.value = Number.isInteger(res) ? res : res.toFixed(2);
+            } catch { display.value = 'Ошибка'; setTimeout(clearDisplay, 1000); }
         }
 
-        // ПАСХАЛКА ДЛЯ ДРУГА
-        console.log("%cОпа, а зачем мы сюда полезли? >w<!", "color: red; font-size: 30px; font-weight: bold;");
-        console.log("%cВы чиго, как тяк можна, ви с дуба рухнуули?! ;D", "color: #ff0000; font-size: 16px;");
+        window.addEventListener('keydown', (e) => {
+            // ИСПРАВЛЕННЫЙ БАГ: Проверяем, что нажата именно одна цифра, а не функциональная клавиша
+            if (/^[0-9]$/.test(e.key)) addToDisplay(e.key);
+            
+            if (['+', '-', '*', '/'].includes(e.key)) addToDisplay(e.key);
+            if (e.key === 'Enter' || e.key === '=') { e.preventDefault(); calculate(); }
+            if (e.key === 'Backspace') deleteLast();
+            if (e.key === 'Escape') clearDisplay();
+            if (e.key === '.' || e.key === ',') addToDisplay('.');
+
+            if (e.keyCode == 123) { e.preventDefault(); return false; }
+            if (e.ctrlKey && (e.shiftKey && (e.keyCode == 73 || e.keyCode == 74 || e.keyCode == 67) || e.keyCode == 85)) {
+                e.preventDefault();
+                return false;
+            }
+        });
+
+        document.addEventListener('contextmenu', event => event.preventDefault());
+
+        const themeBtn = document.getElementById('theme-toggle');
+        themeBtn.addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+            themeBtn.textContent = document.body.classList.contains('dark-mode') ? '☀️ Тема' : '🌙 Тема';
+        });
+
+        console.log("%cПопытка взлома зафиксирована! Шучу, просто сюда нельзя >:D", "color: red; font-size: 20px; font-weight: bold;");
+        console.log("%cPop56kop are coming :D", "color: #ff0000; font-size: 16px; font-style: italic;");
     </script>
 </body>
 </html>
